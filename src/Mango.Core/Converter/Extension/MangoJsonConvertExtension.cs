@@ -17,6 +17,16 @@ namespace Mango.Core.Converter.Extension
         /// <returns></returns>
         public static IMvcBuilder AddMangoJsonConvert(this IMvcBuilder builder)
         {
+            builder.AddJsonOptions(options =>
+            {
+                var converters = options.JsonSerializerOptions.Converters;
+                converters.Add(new DateTimeConverter());
+                converters.Add(new IntConverter());
+                converters.Add(new LongConverter());
+                converters.Add(new NullableDateTimeConverter());
+                converters.Add(new NullableIntConverter());
+                converters.Add(new NullableLongConverter());
+            });
             return builder;
         }
     }
