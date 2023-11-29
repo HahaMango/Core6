@@ -1,13 +1,13 @@
-﻿using Mango.Core.DataStructure;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
-using Mango.Core.Exception;
+using Mango.EntityFramework.DataStructure;
+using Mango.EntityFramework.Exception;
 
-namespace Mango.Core.Extension
+namespace Mango.EntityFramework.Extension
 {
     /// <summary>
     /// Queryable查询扩展类

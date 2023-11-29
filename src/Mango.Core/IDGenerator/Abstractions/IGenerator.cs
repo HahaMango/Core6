@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Mango.Core.KeyGenerator.Abstractions
+namespace Mango.Core.IDGenerator.Abstractions
 {
     /// <summary>
     /// 键生成器接口

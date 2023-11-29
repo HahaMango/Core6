@@ -1,5 +1,5 @@
-﻿using Mango.Core.KeyGenerator;
-using Mango.Core.KeyGenerator.Abstractions;
+﻿using Mango.Core.IDGenerator;
+using Mango.Core.IDGenerator.Abstractions;
 using Mango.Core.Logger;
 using Mango.Core.Network.Abstractions;
 using Mango.Core.Serialization.Extension;

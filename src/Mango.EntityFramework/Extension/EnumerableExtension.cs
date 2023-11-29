@@ -1,17 +1,13 @@
-﻿using Mango.Core.DataStructure;
-using Mango.Core.Exception;
+﻿using Mango.EntityFramework.DataStructure;
+using Mango.EntityFramework.Exception;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 
-namespace Mango.Core.Extension
+namespace Mango.EntityFramework.Extension
 {
-    /// <summary>
-    /// linq 扩展类
-    /// </summary>
     public static class EnumerableExtension
     {
         /// <summary>
@@ -22,7 +18,7 @@ namespace Mango.Core.Extension
         /// <param name="page"></param>
         /// <param name="size"></param>
         /// <returns></returns>
-        public static PageList<T> ToPageList<T>(this IEnumerable<T> enumerable,int page,int size)
+        public static PageList<T> ToPageList<T>(this IEnumerable<T> enumerable, int page, int size)
         {
             if (enumerable == null)
             {

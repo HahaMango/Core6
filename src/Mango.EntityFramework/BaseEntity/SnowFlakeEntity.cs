@@ -1,5 +1,5 @@
 ﻿using Mango.EntityFramework.Abstractions;
-using Mango.KeyGenerator;
+using Mango.EntityFramework.KeyGenerator;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;

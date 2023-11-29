@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Mango.Core.Exception
+namespace Mango.EntityFramework.Exception
 {
     /// <summary>
     /// 自定义异常类型信息常量

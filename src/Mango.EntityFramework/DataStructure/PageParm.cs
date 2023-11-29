@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Mango.Core.DataStructure
+namespace Mango.EntityFramework.DataStructure
 {
     /// <summary>
     /// 分页请求参数

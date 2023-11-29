@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Mango.KeyGenerator
+namespace Mango.EntityFramework.KeyGenerator
 {
     /// <summary>
     /// 雪花Id生成器，必须为单例

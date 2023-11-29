@@ -1,10 +1,10 @@
-﻿using Mango.Core.KeyGenerator.Abstractions;
+﻿using Mango.Core.IDGenerator.Abstractions;
 using Snowflake.Core;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Mango.Core.KeyGenerator
+namespace Mango.Core.IDGenerator
 {
     /// <summary>
     /// 雪花Id生成器，必须为单例
