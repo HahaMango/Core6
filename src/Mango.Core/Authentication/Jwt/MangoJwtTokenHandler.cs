@@ -1,4 +1,7 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Mango.Core.Authentication.TokenStorage;
+using Mango.Core.Authentication.TokenStorage.Abstractions;
+using Mango.Core.IDGenerator;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -17,6 +20,8 @@ namespace Mango.Core.Authentication.Jwt
         /// </summary>
         public MangoJwtOptions Options { get; }
 
+        private readonly ITokenStorage? _tokenStorage;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -29,9 +34,10 @@ namespace Mango.Core.Authentication.Jwt
         /// 构造函数
         /// </summary>
         /// <param name="options"></param>
-        public MangoJwtTokenHandler(MangoJwtOptions options)
+        public MangoJwtTokenHandler(MangoJwtOptions options, ITokenStorage? tokenStorage)
         {
             Options = options;
+            _tokenStorage = tokenStorage;
         }
 
         /// <summary>
@@ -42,17 +48,37 @@ namespace Mango.Core.Authentication.Jwt
         /// <param name="audience">接受者</param>
         /// <param name="issuer">颁发机构</param>
         /// <returns></returns>
-        public string IssuedToken(Claim[] claims, string? issuer = null,string? audience = null)
+        public async Task<string> IssuedTokenAsync(Claim[] claims, string? issuer = null,string? audience = null)
         {
+            //生成雪花id，并插入到claim中
+            var uuid = SnowFlakeGenerator.Instance.GetKey();
+            var cl = new List<Claim>
+            {
+                new Claim("uuid", uuid.ToString())
+            };
+            cl.AddRange(claims);
+
             var sec = Options.ExpiresSec.HasValue ? Options.ExpiresSec.Value : 604800;
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Options.Key));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var token = new JwtSecurityToken(
                 issuer: issuer ?? Options.DefalutIssuer,
                 audience: audience ?? Options.DefalutAudience,
-                claims: claims,
+                claims: cl,
                 expires: DateTime.Now.AddSeconds(sec),
                 signingCredentials: creds);
+
+            //如果存在ITokenStorage则把claims储存到对应的storage中
+            if(_tokenStorage != null)
+            {
+                var claimList = new Dictionary<string, string>();
+                foreach(var claim in cl)
+                {
+                    claimList.Add(claim.Type, claim.Value);
+                }
+                var redisKey = KeyConfig.GetTokenKey(uuid.ToString());
+                await _tokenStorage.SaveToStorageAsync(redisKey, claimList, sec);
+            }
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
@@ -65,9 +91,9 @@ namespace Mango.Core.Authentication.Jwt
         /// <param name="user"></param>
         /// <param name="otherClaims"></param>
         /// <returns></returns>
-        public string IssuedToken(Claim[] claims)
+        public async Task<string> IssuedTokenAsync(Claim[] claims)
         {
-            return IssuedToken(claims : claims, issuer: null, audience: null);
+            return await IssuedTokenAsync(claims : claims, issuer: null, audience: null);
         }
     }
 }

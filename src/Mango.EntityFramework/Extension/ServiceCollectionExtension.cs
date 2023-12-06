@@ -35,7 +35,14 @@ namespace Mango.EntityFramework.Extension
         {
             services.AddDbContext<TDbContext>(config =>
             {
-                config.UseMySql(ServerVersion.AutoDetect(connnectionString));
+                config.UseMySql(connnectionString, ServerVersion.AutoDetect(connnectionString), op =>
+                {
+                    op.EnableRetryOnFailure();
+                });
+            });
+            services.AddScoped<IUnitOfWork>(sp =>
+            {
+                return sp.GetRequiredService<TDbContext>();
             });
             return services;
         }

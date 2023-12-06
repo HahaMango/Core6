@@ -12,6 +12,14 @@ namespace Mango.Core.ApiResponse
     /// </summary>
     public class ApiResult
     {
+        public ApiResult() { }
+
+        public ApiResult(Code code, string? message)
+        {
+            Code = code;
+            Message = message;
+        }
+
         /// <summary>
         /// 返回状态码
         /// </summary>
@@ -29,6 +37,16 @@ namespace Mango.Core.ApiResponse
     /// <typeparam name="T"></typeparam>
     public class ApiResult<T> : ApiResult
     {
+        public ApiResult()
+        {
+
+        }
+
+        public ApiResult(Code code, string? message, T? data) : base(code, message)
+        {
+            Data = data;
+        }
+
         /// <summary>
         /// 返回的json数据内容
         /// </summary>

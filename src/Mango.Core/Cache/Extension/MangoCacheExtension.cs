@@ -28,13 +28,15 @@ namespace Mango.Core.Cache.Extension
             {
                 csb[i] = op.Sentinels[i];
             }
-            var client = new RedisClient(op.ConnectionString, csb);
-            client.Serialize = obj => obj.ToJson();
-            client.Deserialize = (obj, type) => obj.ToObject(type, new System.Text.Json.JsonSerializerOptions
+            var client = new RedisClient(op.ConnectionString, csb)
             {
-                PropertyNameCaseInsensitive = true
-            });
-            services.AddSingleton<RedisClient>(client);
+                Serialize = obj => obj.ToJson(),
+                Deserialize = (obj, type) => obj.ToObject(type, new System.Text.Json.JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                })
+            };
+            services.AddSingleton(client);
             return services;
         }
     }

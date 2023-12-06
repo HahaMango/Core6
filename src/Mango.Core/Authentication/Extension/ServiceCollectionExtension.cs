@@ -1,5 +1,8 @@
 ﻿using Mango.Core.Authentication.Jwt;
-using Mango.Core.Authentication.Policy;
+using Mango.Core.Authentication.Scheme;
+using Mango.Core.Authentication.TokenStorage;
+using Mango.Core.Authentication.TokenStorage.Abstractions;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,8 +28,12 @@ namespace Mango.Core.Authentication.Extension
         {
             var jwtOptions = new MangoJwtOptions();
             options(jwtOptions);
-            var handler = new MangoJwtTokenHandler(jwtOptions);
-            services.AddSingleton(handler);
+            services.AddSingleton(sp =>
+            {
+                using var sc = sp.CreateScope();
+                var ts = sc.ServiceProvider.GetService<ITokenStorage>();
+                return new MangoJwtTokenHandler(jwtOptions, ts);
+            });
             return services;
         }
 
@@ -42,7 +49,8 @@ namespace Mango.Core.Authentication.Extension
         {
             var jwtOptions = new MangoJwtValidationOptions();
             options(jwtOptions);
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            services.AddAuthentication(JsonResultJwtAuthenticationHandler.SchemeName)
+                .AddScheme<AuthenticationSchemeOptions, JsonResultJwtAuthenticationHandler>(JsonResultJwtAuthenticationHandler.SchemeName, op => { })
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, o =>
                 {
                     o.TokenValidationParameters = new TokenValidationParameters
@@ -55,89 +63,49 @@ namespace Mango.Core.Authentication.Extension
                         ValidAudience = jwtOptions.Audience,
                         ValidIssuer = jwtOptions.Issuer,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key)),
-                        AudienceValidator = (validAud, b, c) =>
-                        {
-                            foreach(var aud in validAud)
-                            {
-                                if(aud.Contains(c.ValidAudience))
-                                {
-                                    return true;
-                                }
-                            }
-                            return false;
-                        }
                     };
                 });
             return services;
         }
 
         /// <summary>
-        /// 添加jwt认证
-        /// 
-        /// 认证issuer，过期时间，签名。不认证Audience
+        /// 添加token存储容器服务，可自定义实现ITokenStorage接口即可
         /// </summary>
+        /// <typeparam name="ImpTokenStorage"></typeparam>
         /// <param name="services"></param>
-        /// <param name="options">jwt认证配置</param>
         /// <returns></returns>
-        public static IServiceCollection AddMangoJwtAuthenticationExceptAudience(this IServiceCollection services, Action<MangoJwtValidationOptions> options)
+        public static IServiceCollection AddMangoAuthenticationTokenStorage<ImpTokenStorage>(this IServiceCollection services, Func<IServiceProvider, ImpTokenStorage> op) 
+            where ImpTokenStorage : class,ITokenStorage
         {
-            var jwtOptions = new MangoJwtValidationOptions();
-            options(jwtOptions);
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, o =>
-                {
-                    o.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidateAudience = false,
-                        ValidateLifetime = true,
-                        ClockSkew = TimeSpan.FromMinutes(15),
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = jwtOptions.Issuer,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key))
-                    };
-                });
+            services.AddScoped<ITokenStorage, ImpTokenStorage>(op);
             return services;
         }
 
         /// <summary>
-        /// 添加jwt认证
+        /// 添加token存储容器服务，可自定义实现ITokenStorage接口即可
         /// </summary>
+        /// <typeparam name="ImpTokenStorage"></typeparam>
         /// <param name="services"></param>
-        /// <param name="validationParameters">认证参数配置</param>
         /// <returns></returns>
-        public static IServiceCollection AddMangoJwtAuthentication(this IServiceCollection services, TokenValidationParameters validationParameters)
+        public static IServiceCollection AddMangoAuthenticationTokenStorage<ImpTokenStorage>(this IServiceCollection services)
+            where ImpTokenStorage : class, ITokenStorage
         {
-            var jwtOptions = new MangoJwtValidationOptions();
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, o =>
-                {
-                    o.TokenValidationParameters = validationParameters;
-                });
+            services.AddScoped<ITokenStorage, ImpTokenStorage>();
             return services;
         }
 
         /// <summary>
-        /// 添加jwt Audience授权策略
+        /// 添加token存储容器服务，可自定义实现ITokenStorage接口即可
         /// </summary>
+        /// <typeparam name="ImpTokenStorage"></typeparam>
         /// <param name="services"></param>
-        /// <param name="policyNames">策略名称和有效audiences键值对</param>
-        /// <param name="options">jwt配置</param>
         /// <returns></returns>
-        public static IServiceCollection AddMangoJwtPolicy(this IServiceCollection services , IDictionary<string,string> policyNames, Action<MangoJwtValidationOptions> options)
+        public static IServiceCollection AddMangoRedisAuthenticationTokenStorage(this IServiceCollection services, string redisConnecitonString)
         {
-            services.AddMangoJwtAuthenticationExceptAudience(options);
-            services.AddAuthorizationCore(opt =>
+            services.AddMangoAuthenticationTokenStorage(op =>
             {
-                foreach(var policyname in policyNames)
-                {
-                    opt.AddPolicy(policyname.Key, policy =>
-                        policy.Requirements.Add(new JwtAudienceRequirement(policyname.Value)));
-                }
+                return new RedisTokenStorage(redisConnecitonString);
             });
-
-            services.AddSingleton<IAuthorizationHandler, JwtAudienceHandler>();
-
             return services;
         }
     }

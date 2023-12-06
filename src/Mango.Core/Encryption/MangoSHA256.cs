@@ -53,7 +53,13 @@ namespace Mango.Core.Encryption
         public static string Encrypt2String(string input)
         {
             var sha256Bytes = Encrypt(input);
-            return Encoding.ASCII.GetString(sha256Bytes);
+
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < sha256Bytes.Length; i++)
+            {
+                builder.Append(sha256Bytes[i].ToString("x2"));
+            }
+            return builder.ToString();
         }
     }
 }

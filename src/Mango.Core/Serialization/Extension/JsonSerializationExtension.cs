@@ -145,7 +145,7 @@ namespace Mango.Core.Serialization.Extension
         public static async Task<T> ToObjectAsync<T>(this string source)
             where T : class, new()
         {
-            return await ToObjectAsync<T>(source, _options);
+            return await source.ToObjectAsync<T>(_options);
         }
 
         /// <summary>
@@ -179,7 +179,7 @@ namespace Mango.Core.Serialization.Extension
         public static T ToObject<T>(this string source)
             where T : class, new()
         {
-            return (T)JsonSerializer.Deserialize<T>(source);
+            return source.ToObject<T>(_options);
         }
 
         /// <summary>
@@ -211,7 +211,7 @@ namespace Mango.Core.Serialization.Extension
         /// <returns></returns>
         public static object ToObject(this string source, Type type)
         {
-            return JsonSerializer.Deserialize(source, type);
+            return source.ToObject(type, _options);
         }
 
         /// <summary>

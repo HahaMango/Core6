@@ -44,6 +44,8 @@ namespace Mango.EntityFramework.Repositories
         /// </summary>
         public DbSet<TEntity> Entities => _entities ?? (_entities = _context.Set<TEntity>());
 
+        public IUnitOfWork UnitOfWork => _context;
+
         public void Delete(TEntity entity)
         {
             if (entity == null)

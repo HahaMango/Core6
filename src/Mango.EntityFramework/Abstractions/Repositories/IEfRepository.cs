@@ -14,6 +14,11 @@ namespace Mango.EntityFramework.Abstractions.Repositories
         where TDbcontext : BaseDbContext
     {
         /// <summary>
+        /// 工作单元
+        /// </summary>
+        IUnitOfWork UnitOfWork { get; }
+
+        /// <summary>
         /// 跟踪
         /// </summary>
         IQueryable<TEntity> Table { get; }

@@ -83,7 +83,7 @@ namespace Mango.Core.Network
 
             _bcol = new BlockingCollection<T>();
 
-            _keyGenerator = SnowFlakeGenerator.Instance();
+            _keyGenerator = SnowFlakeGenerator.Instance;
 
             if (logger == null)
             {

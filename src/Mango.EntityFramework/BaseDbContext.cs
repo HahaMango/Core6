@@ -1,5 +1,7 @@
-﻿using Mango.EntityFramework.BaseEntity;
+﻿using Mango.EntityFramework.Abstractions;
+using Mango.EntityFramework.BaseEntity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyModel;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,8 +12,10 @@ namespace Mango.EntityFramework
     /// <summary>
     /// Mango基础EF上下文
     /// </summary>
-    public class BaseDbContext : DbContext
+    public class BaseDbContext : DbContext, IUnitOfWork
     {
+        private IDbContextTransaction _dbContextTransaction;
+
         public BaseDbContext()
         {
         }
@@ -19,6 +23,106 @@ namespace Mango.EntityFramework
         public BaseDbContext(DbContextOptions options) : base(options)
         {
 
+        }
+
+        public IDbContextTransaction BeginTransaction()
+        {
+            if (_dbContextTransaction != null)
+            {
+                return _dbContextTransaction;
+            }
+
+            _dbContextTransaction = Database.BeginTransaction();
+            return _dbContextTransaction;
+        }
+
+        public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
+        {
+            if (_dbContextTransaction != null)
+            {
+                return _dbContextTransaction;
+            }
+
+            _dbContextTransaction = await Database.BeginTransactionAsync(cancellationToken);
+            return _dbContextTransaction;
+        }
+
+        public void Commit()
+        {
+            if (_dbContextTransaction == null) throw new ArgumentNullException(nameof(_dbContextTransaction));
+            try
+            {
+                SaveChanges();
+                _dbContextTransaction.Commit();
+            }
+            catch
+            {
+                _dbContextTransaction.Rollback();
+                throw;
+            }
+            finally
+            {
+                if (_dbContextTransaction != null)
+                {
+                    _dbContextTransaction.Dispose();
+                    _dbContextTransaction = null;
+                }
+            }
+        }
+
+        public async Task CommitAsync(CancellationToken cancellationToken = default)
+        {
+            if (_dbContextTransaction == null) throw new ArgumentNullException(nameof(_dbContextTransaction));
+            try
+            {
+                await SaveChangesAsync(cancellationToken);
+                await _dbContextTransaction.CommitAsync(cancellationToken);
+            }
+            catch
+            {
+                await _dbContextTransaction.RollbackAsync(cancellationToken);
+                throw;
+            }
+            finally
+            {
+                if (_dbContextTransaction != null)
+                {
+                    await _dbContextTransaction.DisposeAsync();
+                    _dbContextTransaction = null;
+                }
+            }
+        }
+
+        public void Rollback()
+        {
+            try
+            {
+                _dbContextTransaction?.Rollback();
+            }
+            catch
+            {
+                if (_dbContextTransaction != null)
+                {
+                    _dbContextTransaction.Dispose();
+                    _dbContextTransaction = null;
+                }
+            }
+        }
+
+        public async Task RollbackAsync(CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                await _dbContextTransaction.RollbackAsync(cancellationToken);
+            }
+            catch
+            {
+                if (_dbContextTransaction != null)
+                {
+                    await _dbContextTransaction.DisposeAsync();
+                    _dbContextTransaction = null;
+                }
+            }
         }
 
         /// <summary>
@@ -38,7 +142,7 @@ namespace Mango.EntityFramework
 
                 foreach (var type in types)
                 {
-                    if (modelBuilder.Model.FindEntityType(type) != null || type.Name == "Entity" || type.Name == "SnowFlakeEntity")
+                    if (modelBuilder.Model.FindEntityType(type) != null || type.Name == "Entity" || type.Name == "SnowFlakeEntity" || type.Name == "BaseFieldEntity")
                         continue;
                     modelBuilder.Model.AddEntityType(type);
                 }

@@ -23,12 +23,8 @@ namespace Mango.Core.Dapper
         /// <param name="databaseType"></param>
         public DapperHelper(string connectionString,Type databaseType)
         {
-            if(databaseType == null)
-            {
-                throw new ArgumentNullException(nameof(databaseType));
-            }
             _connectionString = connectionString;
-            _databaseType = databaseType;
+            _databaseType = databaseType ?? throw new ArgumentNullException(nameof(databaseType));
         }
 
         /// <summary>
@@ -40,10 +36,8 @@ namespace Mango.Core.Dapper
         /// <returns></returns>
         public IEnumerable<T> Query<T>(string sql, object? param = null)
         {
-            using (var cn = InstantiateConnection())
-            {
-                return cn.Query<T>(sql, param);
-            }
+            using var cn = InstantiateConnection();
+            return cn.Query<T>(sql, param);
         }
 
         /// <summary>
@@ -55,10 +49,8 @@ namespace Mango.Core.Dapper
         /// <returns></returns>
         public T QueryFirst<T>(string sql, object? param = null)
         {
-            using (var cn = InstantiateConnection())
-            {
-                return cn.QueryFirst<T>(sql, param);
-            }
+            using var cn = InstantiateConnection();
+            return cn.QueryFirst<T>(sql, param);
         }
 
         /// <summary>
@@ -70,10 +62,8 @@ namespace Mango.Core.Dapper
         /// <returns></returns>
         public T? QueryFirstOrDefault<T>(string sql, object? param = null)
         {
-            using (var cn = InstantiateConnection())
-            {
-                return cn.QueryFirstOrDefault<T>(sql, param);
-            }
+            using var cn = InstantiateConnection();
+            return cn.QueryFirstOrDefault<T>(sql, param);
         }
 
         /// <summary>
@@ -88,10 +78,8 @@ namespace Mango.Core.Dapper
         public async Task<IEnumerable<T>> QueryAsync<T>(string sql, object? param = null, CommandFlags commandFlags = CommandFlags.None, CancellationToken cancellationToken = default)
         {
             var command = new CommandDefinition(sql, param, null, null, null, commandFlags, cancellationToken);
-            using (var cn = InstantiateConnection())
-            {
-                return await cn.QueryAsync<T>(command);
-            }
+            using var cn = InstantiateConnection();
+            return await cn.QueryAsync<T>(command);
         }
 
         /// <summary>
@@ -106,10 +94,8 @@ namespace Mango.Core.Dapper
         public async Task<T> QueryFirstAsync<T>(string sql, object? param = null, CommandFlags commandFlags = CommandFlags.None, CancellationToken cancellationToken = default)
         {
             var command = new CommandDefinition(sql, param, null, null, null, commandFlags, cancellationToken);
-            using (var cn = InstantiateConnection())
-            {
-                return await cn.QueryFirstAsync<T>(command);
-            }
+            using var cn = InstantiateConnection();
+            return await cn.QueryFirstAsync<T>(command);
         }
 
         /// <summary>
@@ -124,10 +110,8 @@ namespace Mango.Core.Dapper
         public async Task<T?> QueryFirstOrDefaultAsync<T>(string sql, object? param = null, CommandFlags commandFlags = CommandFlags.None, CancellationToken cancellationToken = default)
         {
             var command = new CommandDefinition(sql, param, null, null, null, commandFlags, cancellationToken);
-            using (var cn = InstantiateConnection())
-            {
-                return await cn.QueryFirstOrDefaultAsync<T>(command);
-            }
+            using var cn = InstantiateConnection();
+            return await cn.QueryFirstOrDefaultAsync<T>(command);
         }
 
         private IDbConnection InstantiateConnection()

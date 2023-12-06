@@ -13,7 +13,7 @@ namespace Mango.Core.ControllerAbstractions
         /// 返回成功
         /// </summary>
         /// <returns></returns>
-        public virtual ApiResult OK()
+        protected virtual ApiResult OK()
         {
             return new ApiResult
             {
@@ -27,7 +27,7 @@ namespace Mango.Core.ControllerAbstractions
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public virtual ApiResult<T> OK<T>()
+        protected virtual ApiResult<T> OK<T>()
         {
             return new ApiResult<T>
             {
@@ -40,7 +40,7 @@ namespace Mango.Core.ControllerAbstractions
         /// 返回错误
         /// </summary>
         /// <returns></returns>
-        public virtual ApiResult Error()
+        protected virtual ApiResult Error()
         {
             return new ApiResult
             {
@@ -54,7 +54,7 @@ namespace Mango.Core.ControllerAbstractions
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public virtual ApiResult<T> Error<T>()
+        protected virtual ApiResult<T> Error<T>()
         {
             return new ApiResult<T>
             {
@@ -67,7 +67,7 @@ namespace Mango.Core.ControllerAbstractions
         /// 返回授权错误
         /// </summary>
         /// <returns></returns>
-        public virtual ApiResult AuthorizeError()
+        protected virtual ApiResult AuthorizeError()
         {
             return new ApiResult
             {
@@ -81,7 +81,7 @@ namespace Mango.Core.ControllerAbstractions
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public virtual ApiResult<T> AuthorizeError<T>()
+        protected virtual ApiResult<T> AuthorizeError<T>()
         {
             return new ApiResult<T>
             {
@@ -94,7 +94,7 @@ namespace Mango.Core.ControllerAbstractions
         /// 返回权限错误
         /// </summary>
         /// <returns></returns>
-        public virtual ApiResult ForbiddenError()
+        protected virtual ApiResult ForbiddenError()
         {
             return new ApiResult
             {
@@ -108,7 +108,7 @@ namespace Mango.Core.ControllerAbstractions
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public virtual ApiResult<T> ForbiddenError<T>()
+        protected virtual ApiResult<T> ForbiddenError<T>()
         {
             return new ApiResult<T>
             {
@@ -121,7 +121,7 @@ namespace Mango.Core.ControllerAbstractions
         /// 模型验证错误
         /// </summary>
         /// <returns></returns>
-        public virtual ApiResult InValidModelsError()
+        protected virtual ApiResult InValidModelsError()
         {
             var msg = ModelsErrorMessage(ModelState);
             return new ApiResult
@@ -136,7 +136,7 @@ namespace Mango.Core.ControllerAbstractions
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public virtual ApiResult<T> InValidModelsError<T>()
+        protected virtual ApiResult<T> InValidModelsError<T>()
         {
             var msg = ModelsErrorMessage(ModelState);
             return new ApiResult<T>
