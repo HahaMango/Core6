@@ -16,7 +16,7 @@ namespace Mango.EntityFramework.KeyGenerator
         /// </summary>
         private readonly IdWorker _idWorker;
 
-        private static SnowFlakeGenerator _SnowFlakeGenerator;
+        private static Lazy<SnowFlakeGenerator> _SnowFlakeGenerator = new(() => new SnowFlakeGenerator());
 
         /// <summary>
         /// 防止被实例化
@@ -30,13 +30,12 @@ namespace Mango.EntityFramework.KeyGenerator
         /// 获取实例
         /// </summary>
         /// <returns></returns>
-        public static SnowFlakeGenerator Instance()
+        public static SnowFlakeGenerator Instance
         {
-            if(_SnowFlakeGenerator == null)
+            get
             {
-                _SnowFlakeGenerator = new SnowFlakeGenerator();
+                return _SnowFlakeGenerator.Value;
             }
-            return _SnowFlakeGenerator;
         }
 
         /// <summary>

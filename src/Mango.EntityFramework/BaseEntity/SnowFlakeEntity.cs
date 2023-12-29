@@ -10,7 +10,7 @@ namespace Mango.EntityFramework.BaseEntity
     /// <summary>
     /// 雪花算法实体
     /// </summary>
-    public class SnowFlakeEntity : IBaseEntity<long>
+    public abstract class SnowFlakeEntity : IBaseEntity<long>
     {
         private SnowFlakeGenerator _snowFlakeGenerator;
 
@@ -24,7 +24,7 @@ namespace Mango.EntityFramework.BaseEntity
         {
             if(_snowFlakeGenerator == null)
             {
-                _snowFlakeGenerator = SnowFlakeGenerator.Instance();
+                _snowFlakeGenerator = SnowFlakeGenerator.Instance;
             }
             Id = _snowFlakeGenerator.GetKey();
         }

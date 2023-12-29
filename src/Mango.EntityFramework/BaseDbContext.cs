@@ -142,7 +142,7 @@ namespace Mango.EntityFramework
 
                 foreach (var type in types)
                 {
-                    if (modelBuilder.Model.FindEntityType(type) != null || type.Name == "Entity" || type.Name == "SnowFlakeEntity" || type.Name == "BaseFieldEntity")
+                    if (modelBuilder.Model.FindEntityType(type) != null || type.IsAbstract == true)
                         continue;
                     modelBuilder.Model.AddEntityType(type);
                 }

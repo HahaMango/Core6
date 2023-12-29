@@ -1,4 +1,5 @@
 ﻿using Hangfire;
+using Hangfire.Console;
 using Hangfire.HttpJob;
 using Hangfire.HttpJob.Agent.MysqlConsole;
 using Hangfire.MySql;
@@ -35,6 +36,7 @@ namespace Mango.Core.HangfireScheduler.Extension
                     DashboardJobListLimit = 50000,
                     TransactionTimeout = TimeSpan.FromMinutes(1),
                 }));
+                cf.UseConsole();
                 cf.UseHangfireHttpJob();
             });
             //服务端
