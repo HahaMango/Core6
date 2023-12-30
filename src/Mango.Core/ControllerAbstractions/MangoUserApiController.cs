@@ -17,11 +17,15 @@ namespace Mango.Core.ControllerAbstractions
         /// <returns></returns>
         protected IEnumerable<Claim>? GetClaims()
         {
-            if(User == null)
+            if(User == null || User.Identity == null)
             {
                 return null;
             }
             if (!User.Identity.IsAuthenticated)
+            {
+                return null;
+            }
+            if(User.Claims == null || !User.Claims.Any())
             {
                 return null;
             }
