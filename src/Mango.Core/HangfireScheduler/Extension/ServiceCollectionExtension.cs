@@ -3,6 +3,7 @@ using Hangfire.Console;
 using Hangfire.HttpJob;
 using Hangfire.HttpJob.Agent.MysqlConsole;
 using Hangfire.MySql;
+using Mango.Core.Helper;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyModel;
 using System.Reflection;
@@ -32,7 +33,7 @@ namespace Mango.Core.HangfireScheduler.Extension
                     QueuePollInterval = TimeSpan.FromSeconds(15),
                     JobExpirationCheckInterval = TimeSpan.FromHours(1),
                     CountersAggregateInterval = TimeSpan.FromMinutes(5),
-                    PrepareSchemaIfNecessary = false,
+                    PrepareSchemaIfNecessary = true,
                     DashboardJobListLimit = 50000,
                     TransactionTimeout = TimeSpan.FromMinutes(1),
                 }));
@@ -53,14 +54,7 @@ namespace Mango.Core.HangfireScheduler.Extension
         {
             services.AddHangfireJobAgent(op =>
             {
-                var result = new List<Assembly>();
-                var assemblies = DependencyContext.Default.CompileLibraries
-                    .Where(item => item.Name.StartsWith("Mango"))
-                    .ToList();
-                foreach (var assembly in assemblies)
-                {
-                    result.Add(Assembly.Load(assembly.Name));
-                }
+                var result = AssemblyHelper.GetAssemblies(x => x.Name.StartsWith("Mango"));
 
                 foreach (var assembly in result)
                 {

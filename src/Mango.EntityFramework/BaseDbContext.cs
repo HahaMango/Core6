@@ -11,10 +11,13 @@ namespace Mango.EntityFramework
 {
     /// <summary>
     /// Mango基础EF上下文
+    /// (由于DbContext本身不支持单实例多线程使用，所以这里对事务的操作不做额外的加锁。请确保该实例不会被用在多个并发线程中)
     /// </summary>
     public class BaseDbContext : DbContext, IUnitOfWork
     {
-        private IDbContextTransaction _dbContextTransaction;
+        private IDbContextTransaction? _dbContextTransaction;
+
+        public bool IsTransaction => _dbContextTransaction != null;
 
         public BaseDbContext()
         {
@@ -101,6 +104,10 @@ namespace Mango.EntityFramework
             }
             catch
             {
+                throw;
+            }
+            finally
+            {
                 if (_dbContextTransaction != null)
                 {
                     _dbContextTransaction.Dispose();
@@ -116,6 +123,10 @@ namespace Mango.EntityFramework
                 await _dbContextTransaction.RollbackAsync(cancellationToken);
             }
             catch
+            {
+                throw;
+            }
+            finally
             {
                 if (_dbContextTransaction != null)
                 {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Mango.EntityFramework
 {
-
+    [Obsolete("现在已整合到DbContext中")]
     public class UnitOfWork<TDbContext> : IUnitOfWork
         where TDbContext : BaseDbContext
     {

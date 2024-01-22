@@ -81,19 +81,22 @@ namespace Mango.Core.Network.WebSocket
                 return;
             }
             //如果连接被服务器主动关闭则先把连接关闭再重新链接
-            if (_clientWebSocket.State == WebSocketState.CloseReceived)
+            if (_clientWebSocket.State == WebSocketState.CloseReceived || _clientWebSocket.State == WebSocketState.Closed || _clientWebSocket.State == WebSocketState.CloseSent || _clientWebSocket.State == WebSocketState.Aborted)
             {
                 _logger.LogInformation($"重新建立连接....");
-                await CloseAsync();
+                if (_clientWebSocket.State == WebSocketState.CloseReceived || _clientWebSocket.State == WebSocketState.CloseSent)
+                {
+                    await CloseAsync();
+                }
                 _clientWebSocket.Abort();
                 _clientWebSocket = new ClientWebSocket();
             }
-            //链接
+            //建立连接
             try
             {
                 await _clientWebSocket.ConnectAsync(_uri, CancellationToken.None);
             }
-            catch(Exception ex)
+            catch(System.Exception ex)
             {
                 _logger.LogError($"建立连接异常：{ex.Message}");
                 throw;

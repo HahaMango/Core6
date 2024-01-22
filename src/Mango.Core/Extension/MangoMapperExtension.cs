@@ -17,11 +17,11 @@ namespace Mango.Core.Extension
         /// <typeparam name="TDestination"></typeparam>
         /// <param name="source"></param>
         /// <returns></returns>
-        public static TDestination MapTo<TSource, TDestination>(this object source)
+        public static TDestination MapTo<TSource,TDestination>(this TSource source)
         {
-            if(source is not TSource)
+            if(source is null)
             {
-                throw new InvalidCastException($"来源类型不正确：{source.GetType().Name}和泛型{typeof(TSource).Name}不匹配");
+                throw new InvalidCastException($"来源类型不能为空");
             }
             if(!TinyMapper.BindingExists<TSource, TDestination>())
             {

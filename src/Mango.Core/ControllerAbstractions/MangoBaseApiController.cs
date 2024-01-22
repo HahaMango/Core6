@@ -37,6 +37,21 @@ namespace Mango.Core.ControllerAbstractions
         }
 
         /// <summary>
+        /// 返回成功 泛型
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        protected virtual ApiResult<T> OK<T>(T data)
+        {
+            return new ApiResult<T>
+            {
+                Code = Enums.Code.Ok,
+                Message = "成功",
+                Data = data
+            };
+        }
+
+        /// <summary>
         /// 返回错误
         /// </summary>
         /// <returns></returns>
@@ -60,6 +75,20 @@ namespace Mango.Core.ControllerAbstractions
             {
                 Code = Enums.Code.Error,
                 Message = "错误"
+            };
+        }
+
+        /// <summary>
+        /// 返回错误 泛型
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        protected virtual ApiResult<T> Error<T>(string message)
+        {
+            return new ApiResult<T>
+            {
+                Code = Enums.Code.Error,
+                Message = message
             };
         }
 
