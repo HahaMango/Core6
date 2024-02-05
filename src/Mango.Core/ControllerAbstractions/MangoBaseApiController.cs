@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Mango.Core.Exceptions;
 
 namespace Mango.Core.ControllerAbstractions
 {
@@ -150,9 +151,10 @@ namespace Mango.Core.ControllerAbstractions
         /// 模型验证错误
         /// </summary>
         /// <returns></returns>
+        [Obsolete("请使用抛出异常版本")]
         protected virtual ApiResult InValidModelsError()
         {
-            var msg = ModelsErrorMessage(ModelState);
+            var msg = ModelsErrorMessage();
             return new ApiResult
             {
                 Code = Enums.Code.Error,
@@ -165,9 +167,10 @@ namespace Mango.Core.ControllerAbstractions
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
+        [Obsolete("请使用抛出异常版本")]
         protected virtual ApiResult<T> InValidModelsError<T>()
         {
-            var msg = ModelsErrorMessage(ModelState);
+            var msg = ModelsErrorMessage();
             return new ApiResult<T>
             {
                 Code = Enums.Code.Error,
@@ -176,12 +179,26 @@ namespace Mango.Core.ControllerAbstractions
         }
 
         /// <summary>
+        /// 如果模型验证不通过，则抛出异常
+        /// </summary>
+        /// <exception cref="ServiceException"></exception>
+        protected virtual void ThrowIfModelsInValid()
+        {
+            if (!ModelState.IsValid)
+            {
+                var msg = ModelsErrorMessage();
+                throw new ServiceException(msg);
+            }
+        }
+
+        /// <summary>
         /// 模型验证错误信息
         /// </summary>
         /// <param name="modelState"></param>
         /// <returns></returns>
-        private string ModelsErrorMessage(ModelStateDictionary modelState)
+        private string ModelsErrorMessage()
         {
+            var modelState = ModelState;
             StringBuilder sb = new StringBuilder("");
             foreach(var m in modelState)
             {
