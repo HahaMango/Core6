@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Mango.EntityFramework.Repositories
@@ -58,6 +59,15 @@ namespace Mango.EntityFramework.Repositories
             if (entities == null)
                 throw new ArgumentNullException(nameof(entities));
             _context.RemoveRange(entities);
+        }
+
+        /// <summary>
+        /// 基础查询条件表达式树
+        /// </summary>
+        /// <returns></returns>
+        public Expression<Func<TEntity, bool>> GetQueryPredicate()
+        {
+            return item => true;
         }
 
         public void Insert(TEntity entity)

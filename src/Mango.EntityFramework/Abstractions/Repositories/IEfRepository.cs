@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace Mango.EntityFramework.Abstractions.Repositories
@@ -32,5 +33,11 @@ namespace Mango.EntityFramework.Abstractions.Repositories
         /// Db Set
         /// </summary>
         DbSet<TEntity> Entities { get; }
+
+        /// <summary>
+        /// 生成基础的where条件表达式树（用于动态构造查询条件）
+        /// </summary>
+        /// <returns></returns>
+        Expression<Func<TEntity, bool>> GetQueryPredicate();
     }
 }

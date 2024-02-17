@@ -21,6 +21,11 @@ namespace Mango.Core.Converter
         public override DateTime? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             var dateTimeString = reader.GetString();
+            if(!string.IsNullOrEmpty(dateTimeString) && !dateTimeString.Contains(':'))
+            {
+                DateTime dt = DateTime.ParseExact(dateTimeString, "yyyy-MM-dd", System.Globalization.CultureInfo.CurrentCulture);
+                return dt;
+            }
             if (!string.IsNullOrEmpty(dateTimeString))
             {
                 DateTime dt = DateTime.ParseExact(dateTimeString, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.CurrentCulture);

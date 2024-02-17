@@ -11,7 +11,7 @@ namespace Mango.Core.Extension
     public static class MangoMapperExtension
     {
         /// <summary>
-        /// 执行映射
+        /// 执行映射（请勿在EF中搭配分页扩展方法ToPageListAsync使用，会出现sql翻译问题）
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TDestination"></typeparam>
