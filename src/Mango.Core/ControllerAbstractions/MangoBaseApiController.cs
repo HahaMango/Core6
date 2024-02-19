@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Mango.Core.Exceptions;
+using Mango.Core.Serialization.Extension;
 
 namespace Mango.Core.ControllerAbstractions
 {
@@ -148,37 +149,6 @@ namespace Mango.Core.ControllerAbstractions
         }
 
         /// <summary>
-        /// 模型验证错误
-        /// </summary>
-        /// <returns></returns>
-        [Obsolete("请使用抛出异常版本")]
-        protected virtual ApiResult InValidModelsError()
-        {
-            var msg = ModelsErrorMessage();
-            return new ApiResult
-            {
-                Code = Enums.Code.Error,
-                Message = msg
-            };
-        }
-
-        /// <summary>
-        /// 模型验证错误
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        [Obsolete("请使用抛出异常版本")]
-        protected virtual ApiResult<T> InValidModelsError<T>()
-        {
-            var msg = ModelsErrorMessage();
-            return new ApiResult<T>
-            {
-                Code = Enums.Code.Error,
-                Message = msg
-            };
-        }
-
-        /// <summary>
         /// 如果模型验证不通过，则抛出异常
         /// </summary>
         /// <exception cref="ServiceException"></exception>
@@ -186,8 +156,8 @@ namespace Mango.Core.ControllerAbstractions
         {
             if (!ModelState.IsValid)
             {
-                var msg = ModelsErrorMessage();
-                throw new ServiceException(msg);
+                var o = GetModelsErrorObject();
+                throw new ServiceException("模型验证错误", o);
             }
         }
 
@@ -196,23 +166,34 @@ namespace Mango.Core.ControllerAbstractions
         /// </summary>
         /// <param name="modelState"></param>
         /// <returns></returns>
-        private string ModelsErrorMessage()
+        private List<ModelsError> GetModelsErrorObject()
         {
+            var reslt = new List<ModelsError>();
             var modelState = ModelState;
-            StringBuilder sb = new StringBuilder("");
             foreach(var m in modelState)
             {
+                var o = new ModelsError()
+                {
+                    Key = m.Key,
+                    Message = new List<string>()
+                };
                 if (m.Value.ValidationState == ModelValidationState.Invalid)
                 {
-                    StringBuilder esb = new StringBuilder("");
                     foreach(var em in m.Value.Errors)
                     {
-                        esb.Append($"{ em.ErrorMessage}\n");
+                        o.Message.Add(em.ErrorMessage);
                     }
-                    sb.Append($"模型验证错误key:{m.Key},msg:{esb.ToString()}");
                 }
+                reslt.Add(o);
             }
-            return sb.ToString();
+            return reslt;
+        }
+
+        private class ModelsError
+        {
+            public string Key { get; set; }
+
+            public List<string> Message { get; set; }
         }
     }
 }

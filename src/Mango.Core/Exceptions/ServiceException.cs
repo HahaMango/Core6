@@ -15,6 +15,11 @@ namespace Mango.Core.Exceptions
         /// </summary>
         public Code Code { get; }
 
+        /// <summary>
+        /// 错误对象
+        /// </summary>
+        public object E { get; }
+
         public ServiceException(string message) : base(message)
         {
             Code = Code.Error;
@@ -23,6 +28,11 @@ namespace Mango.Core.Exceptions
         public ServiceException(Code code, string message) : base(message)
         {
             Code = code;
+        }
+
+        public ServiceException(string message, object e) : base(message)
+        {
+            E = e;
         }
 
         /// <summary>
@@ -46,6 +56,11 @@ namespace Mango.Core.Exceptions
         public static void Throw(Code code, string message)
         {
             throw new ServiceException(code, message);
+        }
+
+        public static void Throw(string message, object e)
+        {
+            throw new ServiceException(message, e);
         }
     }
 }

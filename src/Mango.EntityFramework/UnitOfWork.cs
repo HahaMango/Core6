@@ -1,4 +1,5 @@
 ﻿using Mango.EntityFramework.Abstractions;
+using Mango.EntityFramework.DataStructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Threading;
@@ -171,6 +172,26 @@ namespace Mango.EntityFramework
             Dispose(true);
             // TODO: 如果在以上内容中替代了终结器，则取消注释以下行。
              GC.SuppressFinalize(this);
+        }
+
+        public Task<IEnumerable<T>> QueryAsync<T>(string sql, object? parm)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<T> QueryFirstOrDefaultAsync<T>(string sql, object? parm)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> ExecuteAsync(string sql, object? parm)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<PageList<T>> QueryPageAsync<T>(string sql, object? parm, PageParm pageParm)
+        {
+            throw new NotImplementedException();
         }
         #endregion
 

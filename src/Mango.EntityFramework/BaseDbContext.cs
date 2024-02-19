@@ -6,6 +6,10 @@ using Microsoft.Extensions.DependencyModel;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Dapper;
+using System.Transactions;
+using System.Data.Common;
+using Mango.EntityFramework.DataStructure;
 
 namespace Mango.EntityFramework
 {
@@ -155,7 +159,19 @@ namespace Mango.EntityFramework
                 {
                     if (modelBuilder.Model.FindEntityType(type) != null || type.IsAbstract == true)
                         continue;
-                    modelBuilder.Model.AddEntityType(type);
+                    var i = modelBuilder.Model.AddEntityType(type);
+
+                    if (type.BaseType == typeof(TimeFieldEntity))
+                    {
+                        //设置时间默认值
+                        modelBuilder.Entity(type.FullName)
+                            .Property(nameof(TimeFieldEntity.CreateTime))
+                            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                        modelBuilder.Entity(type.FullName)
+                            .Property(nameof(TimeFieldEntity.UpdateTime))
+                            .HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
+                    }
                 }
             }
             base.OnModelCreating(modelBuilder);
@@ -177,6 +193,29 @@ namespace Mango.EntityFramework
             }
 
             return result;
+        }
+
+        public async Task<IEnumerable<T>> QueryAsync<T>(string sql, object? parm)
+        {
+            DbTransaction? transaction = _dbContextTransaction?.GetDbTransaction();
+            return await Database.GetDbConnection().QueryAsync<T>(sql, parm, transaction);
+        }
+
+        public async Task<T?> QueryFirstOrDefaultAsync<T>(string sql, object? parm)
+        {
+            DbTransaction? transaction = _dbContextTransaction?.GetDbTransaction();
+            return await Database.GetDbConnection().QueryFirstOrDefaultAsync<T>(sql, parm, transaction);
+        }
+
+        public async Task<int> ExecuteAsync(string sql, object? parm)
+        {
+            DbTransaction? transaction = _dbContextTransaction?.GetDbTransaction();
+            return await Database.GetDbConnection().ExecuteAsync(sql, parm, transaction);
+        }
+
+        public Task<PageList<T>> QueryPageAsync<T>(string sql, object? parm, PageParm pageParm)
+        {
+            throw new NotImplementedException();
         }
     }
 }

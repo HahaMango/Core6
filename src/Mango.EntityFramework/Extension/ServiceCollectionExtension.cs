@@ -30,7 +30,7 @@ namespace Mango.EntityFramework.Extension
         /// <param name="services"></param>
         /// <param name="connnectionString"></param>
         /// <returns></returns>
-        public static IServiceCollection AddMangoDbContext<TDbContext>(this IServiceCollection services, string connnectionString)
+        public static IServiceCollection AddMangoDbContext<TDbContext>(this IServiceCollection services, string connnectionString, string? migrationsAssemblyName = null)
             where TDbContext : BaseDbContext
         {
             services.AddDbContext<TDbContext>(config =>
@@ -38,6 +38,10 @@ namespace Mango.EntityFramework.Extension
                 config.UseMySql(connnectionString, ServerVersion.AutoDetect(connnectionString), op =>
                 {
                     op.EnableRetryOnFailure();
+                    if (!string.IsNullOrWhiteSpace(migrationsAssemblyName))
+                    {
+                        op.MigrationsAssembly(migrationsAssemblyName);
+                    }
                 });
             });
             services.AddScoped<IUnitOfWork>(sp =>

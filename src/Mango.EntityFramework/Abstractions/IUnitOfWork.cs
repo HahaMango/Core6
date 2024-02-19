@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
+﻿using Mango.EntityFramework.DataStructure;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -27,5 +28,15 @@ namespace Mango.EntityFramework.Abstractions
         void Commit();
 
         Task CommitAsync(CancellationToken cancellationToken = default);
+
+        #region 原生SQL查询
+        Task<IEnumerable<T>> QueryAsync<T>(string sql, object? parm);
+
+        Task<T?> QueryFirstOrDefaultAsync<T>(string sql, object? parm);
+
+        Task<int> ExecuteAsync(string sql, object? parm);
+
+        Task<PageList<T>> QueryPageAsync<T>(string sql, object? parm, PageParm pageParm);
+        #endregion
     }
 }
