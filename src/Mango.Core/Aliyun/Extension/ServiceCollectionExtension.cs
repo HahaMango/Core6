@@ -27,6 +27,7 @@ namespace Mango.Core.Aliyun.Extension
             {
                 return new OssClient($"https://{options.Endpoint}", options.AccessKeyId, options.AccessKeySecret);
             });
+            services.AddScoped<AliyunOssApi>();
             return services;
         }
     }

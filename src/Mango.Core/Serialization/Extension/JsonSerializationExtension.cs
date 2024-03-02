@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
+using Mango.Core.Converter;
 
 namespace Mango.Core.Serialization.Extension
 {
@@ -21,8 +22,14 @@ namespace Mango.Core.Serialization.Extension
             _options = new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
             };
+            _options.Converters.Add(new DateTimeConverter());
+            _options.Converters.Add(new IntConverter());
+            _options.Converters.Add(new LongConverter());
+            _options.Converters.Add(new NullableDateTimeConverter());
+            _options.Converters.Add(new NullableIntConverter());
+            _options.Converters.Add(new NullableLongConverter());
         }
 
         /// <summary>
